@@ -1,0 +1,11 @@
+name: AntiPortal
+version: 0.1
+main: de.Initium.AntiPortal.Main.Main
+api-version: 1.16
+author: Modstrype
+
+commands:
+  setPortalTp:
+    description: Setzt den PotalTpPunkt
+  togglePortal:
+    description: Aktiviert/Deaktiviert die Portale auf dem Server

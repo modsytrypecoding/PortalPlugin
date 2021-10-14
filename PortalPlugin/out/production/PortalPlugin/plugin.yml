@@ -1,0 +1,13 @@
+name: PortalPlugin
+version: 0.1
+main: de.Initium.AntiPortal.Main.Main
+api-version: 1.17
+author: Modstrype
+depends:
+  -WorldEdit
+  -WorldGuard
+  -hws
+
+commands:
+  portal:
+    description: MainCMD

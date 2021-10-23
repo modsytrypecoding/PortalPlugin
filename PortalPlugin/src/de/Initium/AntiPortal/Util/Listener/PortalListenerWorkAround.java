@@ -14,7 +14,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -83,5 +85,17 @@ public class PortalListenerWorkAround implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public static void onStopEntityPortal(EntityPortalEvent e) {
+        //stops Entities from using Portals
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public static void onStopCreatePortals(PortalCreateEvent e) {
+        //stops Players from creating Portals
+        e.setCancelled(true);
     }
 }

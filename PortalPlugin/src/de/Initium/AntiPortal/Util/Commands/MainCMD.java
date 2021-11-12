@@ -13,6 +13,7 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import de.Initium.AntiPortal.Main.Main;
 import de.Initium.AntiPortal.Main.Dispatcher.MessageDispatcher;
 import de.Initium.AntiPortal.Main.MySqlConnector;
+import de.Initium.AntiPortal.Main.MySql_Warp_Box;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +26,7 @@ import ovh.bstruntz.hws.UserWarp;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 
 
@@ -41,12 +43,11 @@ public class MainCMD implements CommandExecutor {
                         if(args.length == 1) {
                             p.sendMessage(MessageDispatcher.NoNameChosen);
                         }
-                        if(args.length == 2) {
+                        if(args.length <= 2) {
                             BukkitPlayer bp = BukkitAdapter.adapt(p);
                             ArrayList<String> tmp = new ArrayList<>();
-                            for(UserWarp warp : hws.getUserWarps()) {
-
-                                tmp.add(warp.getName());
+                            for(String warps : MySql_Warp_Box.getAllSWarps()) {
+                                tmp.add(warps);
                             }
                             if(!Main.getConfiguration().getStringList("settings.activePortals").contains(args[1])) {
                                 if(args[1].equalsIgnoreCase("wegpunktportal")) {
@@ -78,6 +79,7 @@ public class MainCMD implements CommandExecutor {
                                                 statement.execute();
                                             } catch (SQLException e) {
                                                 e.printStackTrace();
+                                                p.sendMessage("Dieses Portal existiert bereits");
                                             }
 
                                             p.sendMessage(MessageDispatcher.WayPCreationSuc);
@@ -107,6 +109,7 @@ public class MainCMD implements CommandExecutor {
                                                         if(tmpblock.getBlock().getType().equals(Material.AIR)) {
                                                             tmpblock.getBlock().setType(Material.NETHER_PORTAL);
                                                             iscreated = true;
+
                                                         }
                                                     }
                                                 }
@@ -140,6 +143,8 @@ public class MainCMD implements CommandExecutor {
                                 p.sendMessage(MessageDispatcher.WarpPAlreadyExists);
                             }
 
+                        }else {
+                            p.sendMessage("Bitte benutze /portal setportal <Name>!");
                         }
 
                     } else {
@@ -149,25 +154,33 @@ public class MainCMD implements CommandExecutor {
                 }
                 if(args[0].equalsIgnoreCase("delPortal")) {
                     if(p.hasPermission("Ap.delWarpPortal")) {
-                        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-                        RegionManager wgregions = container.get(BukkitAdapter.adapt(p.getWorld()));
-                        if(wgregions.getRegions().containsKey(args[1])) {
-                            Location locPortal = new Location(p.getWorld(), wgregions.getRegion(args[1]).getMinimumPoint().getBlockX(), wgregions.getRegion(args[1]).getMinimumPoint().getBlockY(), wgregions.getRegion(args[1]).getMinimumPoint().getBlockZ());
-                            p.sendMessage("Die Warp Funktion des Portals an der Stelle \nx:" + locPortal.getBlockX() + "\ny: " + locPortal.getBlockY() + "\nz: " + locPortal.getBlockZ() + "\nwurden entfernt!");
-                            p.sendMessage("Das zuvor genutze Portal wurde wieder gesperrt!");
-                            PreparedStatement statement = null;
-                            try {
-                                statement = MySqlConnector.connection.prepareStatement("DELETE FROM ActivePortals WHERE Names = ?");
-                                statement.setString(1, args[1]);
-                                statement.execute();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                            wgregions.removeRegion(args[1]);
-                            p.sendMessage(MessageDispatcher.PortalDelSuc);
-                        }else {
-                            p.sendMessage("Das von dir gewählte WarpPortal " + args[1] + " existiert nicht");
+                        if(args.length == 1) {
+                            p.sendMessage(MessageDispatcher.NoNameChosen);
                         }
+                        if(args.length <= 2) {
+                            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                            RegionManager wgregions = container.get(BukkitAdapter.adapt(p.getWorld()));
+                            if(wgregions.getRegions().containsKey(args[1])) {
+                                Location locPortal = new Location(p.getWorld(), wgregions.getRegion(args[1]).getMinimumPoint().getBlockX(), wgregions.getRegion(args[1]).getMinimumPoint().getBlockY(), wgregions.getRegion(args[1]).getMinimumPoint().getBlockZ());
+                                p.sendMessage("Die Warp Funktion des Portals an der Stelle \nx:" + locPortal.getBlockX() + "\ny: " + locPortal.getBlockY() + "\nz: " + locPortal.getBlockZ() + "\nwurden entfernt!");
+                                p.sendMessage("Das zuvor genutze Portal wurde wieder gesperrt!");
+                                PreparedStatement statement = null;
+                                try {
+                                    statement = MySqlConnector.connection.prepareStatement("DELETE FROM ActivePortals WHERE Names = ?");
+                                    statement.setString(1, args[1]);
+                                    statement.execute();
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                                wgregions.removeRegion(args[1]);
+                                p.sendMessage(MessageDispatcher.PortalDelSuc);
+                            }else {
+                                p.sendMessage("Das von dir gewählte WarpPortal " + args[1] + " existiert nicht");
+                            }
+                        }else {
+                            p.sendMessage("Bitte benutze /portal delportal <Name>!");
+                        }
+
                     }else {
                         p.sendMessage(MessageDispatcher.NoPerms);
                     }

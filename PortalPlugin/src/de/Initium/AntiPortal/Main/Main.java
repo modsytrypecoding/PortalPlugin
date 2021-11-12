@@ -29,6 +29,7 @@ public class Main extends JavaPlugin {
         try {
             log.info("Connecting to MySql...");
             MySqlConnector.connect();
+            MySqlConnector_SWarps.connect();
             log.info(ChatColor.GREEN + "[MySql] Connection success");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -62,6 +63,13 @@ public class Main extends JavaPlugin {
             configfileConfiguration.set("settings.MySqlData.Username", "Portal");
             configfileConfiguration.set("settings.MySqlData.Password", "6zrl.NVHbyxio.-m");
             configfileConfiguration.set("settings.MySqlData.Port", 3306);
+
+            configfileConfiguration.createSection("settings.MySqlData-SWarps");
+            configfileConfiguration.set("settings.MySqlData-SWarps.Host", "localhost");
+            configfileConfiguration.set("settings.MySqlData-SWarps.Port", 3306);
+            configfileConfiguration.set("settings.MySqlData-SWarps.DataBase", "HWS-Dev");
+            configfileConfiguration.set("settings.MySqlData-SWarps.Username", "home_warp_spawn_dev");
+            configfileConfiguration.set("settings.MySqlData-SWarps.Password", "@gqfeI(nXTL@/372");
             saveConfiguration();
         }
 
